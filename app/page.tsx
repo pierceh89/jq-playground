@@ -103,10 +103,10 @@ const tutorials = [
         query: ".products | map(.price * 1.1)",
         description: "가격에 10% 추가",
       },
-      // {
-      //   query: ".users | map(.name | ascii_upcase)",
-      //   description: "이름을 대문자로",
-      // }, // not supported in jqts
+      {
+        query: ".users | map(.name | ascii_upcase)",
+        description: "이름을 대문자로",
+      },
     ],
   },
   {
@@ -130,8 +130,12 @@ const tutorials = [
 // jq simulator for web
 async function executeJQ(data: any, query: string): Promise<any> {
   try {
-    const { default: jq } = await import("jq-web");
-    const result = await jq.promised.json(data, query);
+    // 동적으로 jq-web 모듈을 import
+    const jq = await import("jq-web");
+    const jqInstance = jq.default || jq;
+
+    // Use the promised API for better reliability with WebAssembly loading
+    const result = await jqInstance.promised.json(data, query);
     return result;
   } catch (error) {
     return `오류: ${error}`;

@@ -19,6 +19,26 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  webpack: (config) => {
+    config.experiments = {
+      ...(config.experiments || {}),
+      asyncWebAssembly: true,
+    };
+
+    // jq-web 패키지에 대한 특별한 처리
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+    };
+
+    // jq-web WASM 파일 복사
+    config.module.rules.push({
+      test: /\.wasm$/,
+      type: "asset/resource",
+    });
+
+    return config;
+  },
 };
 
 export default nextConfig;
