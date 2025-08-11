@@ -15,7 +15,6 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Play, Copy, RotateCcw, BookOpen, Code2 } from "lucide-react";
-import jq from "jqts";
 
 const exampleData = {
   users: [
@@ -129,11 +128,10 @@ const tutorials = [
 ];
 
 // jq simulator for web
-function executeJQ(data: any, query: string): any {
+async function executeJQ(data: any, query: string): Promise<any> {
   try {
-    const pattern = jq.compile(query);
-    const result = pattern.evaluate(data);
-
+    const { default: jq } = await import("jq-web");
+    const result = await jq.promised.json(data, query);
     return result;
   } catch (error) {
     return `오류: ${error}`;
@@ -148,10 +146,10 @@ export default function JQPlayground() {
   const [result, setResult] = useState("");
   const [activeTab, setActiveTab] = useState("basics");
 
-  const executeQuery = () => {
+  const executeQuery = async (): Promise<void> => {
     try {
       const data = JSON.parse(jsonInput);
-      const output = executeJQ(data, query);
+      const output = await executeJQ(data, query);
       setResult(JSON.stringify(output, null, 2));
     } catch (error) {
       setResult(`JSON 파싱 오류: ${error}`);
